@@ -1,10 +1,11 @@
 package org.example;
 
-import org.example.Ledger;
+
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
+
 
 public class Main {
     public static void main(String[] args) {
@@ -14,31 +15,40 @@ public class Main {
 
     public static void DisplayScreen() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Screen Ledger Options:");
-        System.out.println("[P] Make payment (Debit)");
-        System.out.println("[D] Add deposit");
-        System.out.println("[L] Display Ledger");
-        System.out.println("[X] Exit");
+        String input;
+        do {
+            System.out.println("Screen Ledger Options:");
+            System.out.println("[P] Make payment (Debit)");
+            System.out.println("[D] Add deposit");
+            System.out.println("[L] Display Ledger");
+            System.out.println("[X] Exit");
 
-        String input = scanner.nextLine();
-        switch (input.toUpperCase()) {// switch statement to check each choice
-            case "P":
-                makePayment();
-                break;// add break at end of every case so it can check/move on to next case
-            case "D":
-                addDeposit();
-                break;
-            case "L":
-                Ledger.displayLedger();//look in the ledger class
-                break;
-            case "X":
-                System.exit(0);
-            default:
-                System.out.println("Invalid entry");// restarts in case invalid entry is put in
-                break;
-        }
+            input = scanner.nextLine();
+            switch (input.toUpperCase()) {// switch statement to check each choice
+                case "P":
+                    makePayment();
+                    break;// add break at end of every case so it can check/move on to next case
+                case "D":
+                    addDeposit();
+                    break;
+                case "L":
+                    Ledger.displayLedger();//look in the ledger class
+                    break;
+                case "X":
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid entry");// restarts in case invalid entry is put in
+                    break;
+            }
+        } while (!input.equalsIgnoreCase("x"));
+    }
+
+    public static void displayLedger(){
+        Ledger.displayLedger();
 
     }
+
 
     private static void makePayment() {
         Scanner scanner = new Scanner(System.in);
@@ -70,7 +80,7 @@ public class Main {
 
 
         }
-        DisplayScreen();
+
 
     }
 
@@ -105,8 +115,9 @@ public class Main {
 
 
         }
-        DisplayScreen();
+
 
 
     }
 }
+

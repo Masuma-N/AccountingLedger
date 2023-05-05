@@ -6,8 +6,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+
 
 
 public class Ledger {
@@ -17,7 +20,7 @@ public class Ledger {
 
     public static ArrayList<Transaction> getTransactions() {
 
-        String path = "./srs/main/resources/transactions.csv";
+        String path = "./src/main/resources/transactions.csv";
         String line = "";
 
         ArrayList<Transaction> transactionslist = new ArrayList<>();
@@ -36,10 +39,9 @@ public class Ledger {
                 transactionslist.add(transaction);
             }
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("File not found");
+            System.exit(0);
         }
         return transactionslist;
     }
@@ -47,36 +49,38 @@ public class Ledger {
 
     public static void displayLedger() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Screen Ledger Options:");
-        System.out.println("[A] Display Entries");
-        System.out.println("[D] Display all deposits");
-        System.out.println("[P] Display all payments");
-        System.out.println("[R] Run a report");
-        System.out.println("[H] Go back to home");
+        while (true) {
+            System.out.println("Screen Ledger Options:");
+            System.out.println("[A] Display Entries");
+            System.out.println("[D] Display all deposits");
+            System.out.println("[P] Display all payments");
+            System.out.println("[R] Run a report");
+            System.out.println("[H] Go back to home");
 
 
-        String input = scanner.nextLine();
-        switch (input.toUpperCase()) {// switch statement to check each choice
-            case "A":
-                displayEntry();
-                break;// add break at end of every case so it can check/move on to next case
-            case "D":
-                depositEntry();
-                break;
-            case "P":
-                paymentEntry();
-                break;
-            case "R":
-                reportEntry();
-                break;
+            String input = scanner.nextLine();
+            switch (input.toUpperCase()) {// switch statement to check each choice
+                case "A":
+                    displayEntry();
+                    break;// add break at end of every case so it can check/move on to next case
+                case "D":
+                    depositEntry();
+                    break;
+                case "P":
+                    paymentEntry();
+                    break;
+                case "R":
+                    reportEntry();
+                    break;
 
-            case "H":
-                Main.DisplayScreen();
-            default:
-                System.out.println("Invalid entry");// restarts in case invalid entry is put in
-                break;
+                case "H":
+                    Main.DisplayScreen();
+                default:
+                    System.out.println("Invalid entry");// restarts in case invalid entry is put in
+                    break;
 
 
+            }
         }
     }
 
@@ -142,7 +146,6 @@ public class Ledger {
         System.out.println("[H] Go back to home");
 
 
-
         String input = scanner.nextLine();
         switch (input.toUpperCase()) {// switch statement to check each choice
             case "1":
@@ -171,23 +174,93 @@ public class Ledger {
         }
 
     }
+
     public static void monthDate() {
+        System.out.println("Here is your month to date report: ");
+        LocalDate currentDate = LocalDate.now(); // this method gets the current date using 'LocalDate.now()
+        LocalDate startOfTheCurrentMonth = currentDate.withDayOfMonth(1); // this method gets the first day of the month
+        //using the 'withDayOfMonth(1) method
+        // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy"); // using the DateTimeFormatter
+        //class to format the dates in month to date format
+        System.out.println("From" + " " + startOfTheCurrentMonth + " to " + currentDate);
+
+        for (Transaction item : transactionslist) {
+            //if we don't subtract 1 , the first day of the month will be excluded since we are using 'isAfter' method
+            if (item.getDate().isAfter(startOfTheCurrentMonth.minusDays(1)) || item.getDate().isEqual(currentDate)) {
+                System.out.println(item.getDate() + " | " + item.getTime() + " | " + item.getDescription() + " | " +
+                        item.getVendor() + " | " + item.getAmount());
+            }
 
 
+        }
     }
 
     public static void previousMonth() {
+        LocalDate today = LocalDate.now();
+        int previousMonthsValue = today.minusMonths(1).getMonthValue();
+        System.out.println("Previous months");
+        for (Transaction item : transactionslist) {
+            LocalDate transactionDate = item.getDate();
+            if (transactionDate.getMonthValue() == previousMonthsValue && transactionDate.getYear() == today.getYear()) {
+                System.out.println(item.getDate() + " | " + item.getTime() + " | " + item.getDescription() + " | " +
+                        item.getVendor() + " | " + item.getAmount());
+            }
+        }
     }
 
+
     public static void previousYear() {
+        LocalDate today = LocalDate.now();
+        int previousYearValue = today.minusYears(1).getYear();
+        System.out.println("Previous Year:");
+        for (Transaction item : transactionslist) {
+            LocalDate transactionDate = item.getDate();
+            if (transactionDate.getYear() == previousYearValue && transactionDate.getYear() != today.getYear()) {
+                // condition checks if transaction is in previous year and if so then prints it out
+                System.out.println(item.getDate() + " | " + item.getTime() + " | " + item.getDescription() + " | " +
+                        item.getVendor() + " | " + item.getAmount());
+            }
+
+
+        }
+
+
     }
 
     public static void yearDate() {
+        System.out.println("Here is your year to date report: ");
+        LocalDate currentDate = LocalDate.now(); // this method gets the current date using 'LocalDate.now()
+        LocalDate startOfTheCurrentYear = currentDate.withDayOfYear(1); // this method gets the first day of the month
+        //using the 'withDayOfMonth(1) method
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy"); // using the DateTimeFormatter
+        //class to format the dates in month to date format
+        System.out.println("From" + " " + startOfTheCurrentYear.format(formatter) + " to " + currentDate.format(formatter));
+
+        for (Transaction transaction : transactionslist) {
+            //if we don't subtract 1 , the first day of the month will be excluded since we are using 'isAfter' method
+            if (transaction.getDate().isAfter(startOfTheCurrentYear.minusDays(1)) || transaction.getDate().isEqual(currentDate)) {
+                System.out.println(transaction.getDate() + " | " + transaction.getTime() + " | " + transaction.getDescription() + " | " +
+                        transaction.getVendor() + " | " + transaction.getAmount());
+            }
+        }
     }
 
     public static void searchVendor() {
-
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Vendor's name: ");
+        String NameofVendor = scanner.nextLine();
+        for (Transaction item : transactionslist) {
+            if (item.getVendor().equalsIgnoreCase(NameofVendor)) {
+                System.out.println(item.getDate() + " | " + item.getTime() + " | " + item.getDescription() + " | " +
+                        item.getVendor() + " | " + item.getAmount());
+            }
+        }
     }
 
+    private static void goBack() {
+        displayLedger(); //backtoReport takes us
 
+
+    }
 }
+
